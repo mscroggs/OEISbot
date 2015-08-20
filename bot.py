@@ -36,15 +36,6 @@ def me():
 def joiner():
     return "\n\n- - - -\n\n"
 
-def commented_on(comment):
-    reps = comment.replies
-    for com in reps:
-        if isinstance(com,MoreComments):
-            reps += com.comments()
-        elif com.author is not None and com.author.name == "OEISbot":
-            return True
-    return False
-
 for sub in subs:
     subreddit = r.get_subreddit(sub)
     for submission in subreddit.get_hot(limit = 10):
@@ -69,8 +60,6 @@ for sub in subs:
                 re_s = re.findall("A([0-9]{6})",comment.body)
                 post_me = []
                 for seq_n in re_s:
-                    if commented_on(comment):
-                        seen[submission.id].append(seq_n)
                     if seq_n not in seen[submission.id]:
                         post_me.append(markup(seq_n))
                         seen[submission.id].append(seq_n)
