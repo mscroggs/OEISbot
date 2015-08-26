@@ -31,7 +31,7 @@ def markup(seq_n):
     return new_com
 
 def me():
-    return "^(OEISbot was programmed by /u/mscroggs.)"
+    return "^(I am OEISbot. I was programmed by /u/mscroggs.)"
 
 def joiner():
     return "\n\n- - - -\n\n"
