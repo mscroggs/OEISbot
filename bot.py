@@ -4,7 +4,7 @@ import urllib
 import json
 from praw.objects import MoreComments
 
-with open("/home/pi/OEIS/seen") as f:
+with open("/home/pi/OEISbot/seen") as f:
     seen = json.load(f)
 
 r = praw.Reddit('OEIS link and description poster by /u/mscroggs.')
@@ -74,5 +74,5 @@ for sub in subs:
         continue
     break
 
-with open("/home/pi/OEIS/seen","w") as f:
+with open("/home/pi/OEISbot/seen","w") as f:
     json.dump(seen,f)
