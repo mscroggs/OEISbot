@@ -17,7 +17,7 @@ auth = r.get_me()
 subs = ['math','mathpuzzles','casualmath','theydidthemath',
         'learnmath','mathbooks','cheatatmathhomework','matheducation',
         'puremathematics','mathpics','mathriddles','askmath',
-        'recreationalmath']
+        'recreationalmath','OEIS']
 
 def markup(seq_n):
     pattern = re.compile("%N (.*?)<",re.DOTALL|re.M)
