@@ -58,8 +58,14 @@ for sub in subs:
         flat_comments = praw.helpers.flatten_tree(submission.comments)
         for comment in flat_comments:
             if not isinstance(comment,MoreComments) and comment.author is not None and comment.author.name != "OEISbot":
-                re_s = re.findall("A([0-9]{6})",comment.body)
+                re_s = re.findall("oeis\.org/A([0-9]{6})",comment.body)
                 post_me = []
+                for seq_n in re_s:
+                    if seq_n not in seen[submission.id]:
+                        post_me.append(markup(seq_n))
+                        seen[submission.id].append(seq_n)
+                no_links = re.sub("\[[^\]]*\]\([^\)*]\)","",comment.body)
+                re_s = re.findall("oeis\.org/A([0-9]{6})",no_links)
                 for seq_n in re_s:
                     if seq_n not in seen[submission.id]:
                         post_me.append(markup(seq_n))
