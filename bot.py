@@ -7,7 +7,7 @@ from praw.objects import MoreComments
 import sys
 test = False
 
-if sys.argv[1]=="test":
+if len(sys.argv)>1 and sys.argv[1]=="test":
     test=True
 
 print test
