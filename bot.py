@@ -4,6 +4,14 @@ import urllib
 import json
 from praw.objects import MoreComments
 
+import os
+test = False
+
+if os.argv[1]=="test":
+    test=True
+
+print test
+
 with open("/home/pi/OEISbot/seen") as f:
     seen = json.load(f)
 
@@ -18,6 +26,9 @@ subs = ['TestingOEISbot','math','mathpuzzles','casualmath','theydidthemath',
         'learnmath','mathbooks','cheatatmathhomework','matheducation',
         'puremathematics','mathpics','mathriddles','askmath',
         'recreationalmath','OEIS']
+
+if test:
+    subs = ["TestingOEISbot"]
 
 def markup(seq_n):
     pattern = re.compile("%N (.*?)<",re.DOTALL|re.M)
@@ -55,6 +66,10 @@ for sub in subs:
             post_me.append(me())
             submission.add_comment(joiner().join(post_me))
             break
+
+        re_s = re.findall("[^0-9, ] ?[0-9]+, ?([0-9]+, ?)+ ?[^0-9, ]",submission.title)
+        
+
         flat_comments = praw.helpers.flatten_tree(submission.comments)
         for comment in flat_comments:
             if not isinstance(comment,MoreComments) and comment.author is not None and comment.author.name != "OEISbot":
