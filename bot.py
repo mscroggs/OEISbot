@@ -23,7 +23,7 @@ def open_list(_id):
         return []
 
 def look_for_Annnnnn():
-    
+    pass
 
 
 r = praw.Reddit('OEIS link and description poster by /u/mscroggs.')
