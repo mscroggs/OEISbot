@@ -69,6 +69,7 @@ for sub in subs:
 
         re_s = re.findall("[^0-9, ] ?[0-9]+, ?([0-9]+, ?)+ ?[^0-9, ]",submission.title)
         if test:
+            print submission.title
             print re_s
 
         flat_comments = praw.helpers.flatten_tree(submission.comments)
@@ -92,6 +93,7 @@ for sub in subs:
                     break
                 re_s = re.findall("[^0-9, ] ?[0-9]+, ?([0-9]+, ?)+ ?[^0-9, ]",comment.body)
                 if test:
+                    print comment.body
                     print re_s
         else:
             continue
