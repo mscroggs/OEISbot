@@ -48,24 +48,26 @@ def look_for_ls(id_, text, url, comment):
     if test:
         print(text)
     re_s = re.findall("([0-9]+\, *(?:[0-9]+\, *)+[0-9]+)",text)
-    if test:
-        print(re_s)
-    if len(re_s)>0 and re_s[0] not in seen:
-        seen.append(re_s[0])
-        first10, total = load_search(re_s[0])
-        intro = "Your sequence ("+re_s[0]+") may be one of the following OEIS sequences."
-        if total > 4:
-            intro += " Or, it may be one of the "+str(total-4)+" other sequences listed [here](http://oeis.org/search?q="+re_s[0]+")."
-        post_me = [intro]
+    if len(re_s)>0:
+        terms = "".join(re_s[0].split(" "))
         if test:
-            print(first10)
-        for seq_n in first10[:4]:
-            post_me.append(markup(seq_n))
-        post_me.append(me())
-        comment(joiner().join(post_me))
-        save_list(seen, id_)
-        raise FoundOne
-            
+            print(terms)
+        if terms not in seen:
+            seen.append(terms)
+            first10, total = load_search(terms)
+            if len(first10)>0:
+                intro = "Your sequence ("+terms+") may be one of the following OEIS sequences."
+                if total > 4:
+                    intro += " Or, it may be one of the "+str(total-4)+" other sequences listed [here](http://oeis.org/search?q="+terms+")."
+                post_me = [intro]
+                if test:
+                    print(first10)
+                for seq_n in first10[:4]:
+                    post_me.append(markup(seq_n))
+                post_me.append(me())
+                comment(joiner().join(post_me))
+                save_list(seen, id_)
+                raise FoundOne            
 
 def load_search(terms):
     src=urllib.urlopen("http://oeis.org/search?fmt=data&q="+terms).read()
@@ -107,6 +109,7 @@ def joiner():
     return "\n\n- - - -\n\n"
 try:
     for sub in subs:
+        print(sub)
         subreddit = r.get_subreddit(sub)
         for submission in subreddit.get_hot(limit = 10):
             if test:
