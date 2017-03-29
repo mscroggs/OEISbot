@@ -6,11 +6,24 @@ from praw.objects import MoreComments
 
 import sys
 test = False
-
 if len(sys.argv)>1 and sys.argv[1]=="test":
     test=True
+    print("TEST MODE")
 
-print test
+
+def save_list(seen, _id):
+    with open("/home/pi/OEISbot/seen/"+_id,"w") as f:
+        return json.dump(seen, f)
+
+def open_list(_id):
+    try:
+        with open("/home/pi/OEISbot/seen/"+_id) as f:
+            return json.load(f)
+    except:
+        return []
+
+def look_for_Annnnnn():
+    
 
 
 r = praw.Reddit('OEIS link and description poster by /u/mscroggs.')
@@ -49,17 +62,14 @@ def joiner():
 for sub in subs:
     subreddit = r.get_subreddit(sub)
     for submission in subreddit.get_hot(limit = 10):
-        try:
-            seen[submission.id]
-        except KeyError:
-            seen[submission.id] = []
+        seen = open_list(submission.id)
         re_s = re.findall("A([0-9]{6})",submission.title)
         re_s += re.findall("oeis\.org/A([0-9]{6})",submission.url)
         post_me = []
         for seq_n in re_s:
-            if seq_n not in seen[submission.id]:
+            if seq_n not in seen:
                 post_me.append(markup(seq_n))
-                seen[submission.id].append(seq_n)
+                seen.append(seq_n)
         if len(post_me)>0:
             post_me.append(me())
             submission.add_comment(joiner().join(post_me))
@@ -76,29 +86,29 @@ for sub in subs:
                 re_s = re.findall("oeis\.org/A([0-9]{6})",comment.body)
                 post_me = []
                 for seq_n in re_s:
-                    if seq_n not in seen[submission.id]:
+                    if seq_n not in seen:
                         post_me.append(markup(seq_n))
-                        seen[submission.id].append(seq_n)
+                        seen.append(seq_n)
                 no_links = re.sub("\[[^\]]*\]\([^\)*]\)","",comment.body)
-                re_s = re.findall("oeis\.org/A([0-9]{6})",no_links)
+                re_s = re.findall("A([0-9]{6})",no_links)
                 for seq_n in re_s:
-                    if seq_n not in seen[submission.id]:
+                    if seq_n not in seen:
                         post_me.append(markup(seq_n))
-                        seen[submission.id].append(seq_n)
+                        seen.append(seq_n)
                 if len(post_me)>0:
                     post_me.append(me())
                     comment.reply(joiner().join(post_me))
                     break
-                re_s = re.findall("^|[^0-9, ] ?[0-9]+, ?([0-9]+, ?)+ ?[^0-9, ]|$",comment.body)
+                re_s = re.findall("(^|[^0-9, ]) ?[0-9]+, ?([0-9]+, ?)+ ?([^0-9, ]|$)",comment.body)
                 if test:
                     print comment.body
                     print re_s
         else:
+            save_list(seen, submission.id)
             continue
+        save_list(seen, submission.id)
         break
     else:
         continue
     break
 
-with open("/home/pi/OEISbot/seen","w") as f:
-    json.dump(seen,f)
