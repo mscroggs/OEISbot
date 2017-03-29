@@ -14,7 +14,7 @@ r.set_access_credentials(**access_i)
 
 auth = r.get_me()
 
-subs = ['math','mathpuzzles','casualmath','theydidthemath',
+subs = ['TestingOEISbot','math','mathpuzzles','casualmath','theydidthemath',
         'learnmath','mathbooks','cheatatmathhomework','matheducation',
         'puremathematics','mathpics','mathriddles','askmath',
         'recreationalmath','OEIS']
