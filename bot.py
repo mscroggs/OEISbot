@@ -85,7 +85,7 @@ auth = r.get_me()
 subs = ['TestingOEISbot','math','mathpuzzles','casualmath','theydidthemath',
         'learnmath','mathbooks','cheatatmathhomework','matheducation',
         'puremathematics','mathpics','mathriddles','askmath',
-        'recreationalmath','OEIS']
+        'recreationalmath','OEIS','mathclubs','maths']
 
 if test:
     subs = ["TestingOEISbot"]
