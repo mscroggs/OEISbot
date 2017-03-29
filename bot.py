@@ -4,10 +4,10 @@ import urllib
 import json
 from praw.objects import MoreComments
 
-import os
+import sys
 test = False
 
-if os.argv[1]=="test":
+if sys.argv[1]=="test":
     test=True
 
 print test
