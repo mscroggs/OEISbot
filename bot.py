@@ -12,8 +12,6 @@ if len(sys.argv)>1 and sys.argv[1]=="test":
 
 print test
 
-with open("/home/pi/OEISbot/seen") as f:
-    seen = json.load(f)
 
 r = praw.Reddit('OEIS link and description poster by /u/mscroggs.')
 
@@ -91,7 +89,7 @@ for sub in subs:
                     post_me.append(me())
                     comment.reply(joiner().join(post_me))
                     break
-                re_s = re.findall("[^0-9, ] ?[0-9]+, ?([0-9]+, ?)+ ?[^0-9, ]",comment.body)
+                re_s = re.findall("^|[^0-9, ] ?[0-9]+, ?([0-9]+, ?)+ ?[^0-9, ]|$",comment.body)
                 if test:
                     print comment.body
                     print re_s
