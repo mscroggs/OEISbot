@@ -90,6 +90,9 @@ for sub in subs:
                     post_me.append(me())
                     comment.reply(joiner().join(post_me))
                     break
+                re_s = re.findall("[^0-9, ] ?[0-9]+, ?([0-9]+, ?)+ ?[^0-9, ]",comment.body)
+                if test:
+                    print re_s
         else:
             continue
         break
