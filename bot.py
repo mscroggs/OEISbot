@@ -55,6 +55,8 @@ def look_for_ls(id_, text, comment, link, message):
             if terms not in seen:
                 seen.append(terms)
                 first10, total = load_search(terms)
+                if test:
+                    print(first10)
                 if len(first10)>0 and total <= 14:
                     intro = "Your sequence ("+terms+") may be one of the following OEIS sequences."
                     if total > 4:
@@ -69,7 +71,7 @@ def look_for_ls(id_, text, comment, link, message):
                     save_list(seen, id_)
                     raise FoundOne
                 elif len(first10)==0:
-                    post_me("I couldn't find your sequence ("+terms+") in the OEIS. You should add it!")
+                    post_me = ["I couldn't find your sequence ("+terms+") in the [OEIS](http://oeis.org). You should add it!"]
                     message("PeteOK", "Sequence not in OEIS", "Hi Peter, I've just found a new sequence ("+terms+") in [this thread](link). Please shout at /u/mscroggs to turn the feature off if its spamming you!")
                     post_me.append(me())
                     comment(joiner().join(post_me))
@@ -79,7 +81,10 @@ def look_for_ls(id_, text, comment, link, message):
 def load_search(terms):
     src=urllib.urlopen("http://oeis.org/search?fmt=data&q="+terms).read()
     ls = re.findall("href=(?:'|\")/A([0-9]{6})(?:'|\")",src)
-    tot = int(re.findall("of ([0-9]+) results found",src)[0])
+    try:
+        tot = int(re.findall("of ([0-9]+) results found",src)[0])
+    except:
+        tot = 0
     return ls, tot
 
 r = praw.Reddit('OEIS link and description poster by /u/mscroggs.')
@@ -121,8 +126,8 @@ try:
         for submission in subreddit.get_hot(limit = 10):
             if test:
                 print(submission.title)
-            look_for_A(submission.id, submission.title, submission.url, submission.add_comment)
-            look_for_ls(submission.id, submission.title, submission.add_comment, submission.url, r.send_message)
+            look_for_A(submission.id, submission.title+"|"+submission.selftext, submission.url, submission.add_comment)
+            look_for_ls(submission.id, submission.title+"|"+submission.selftext, submission.add_comment, submission.url, r.send_message)
 
             flat_comments = praw.helpers.flatten_tree(submission.comments)
             for comment in flat_comments:
