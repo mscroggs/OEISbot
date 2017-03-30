@@ -55,7 +55,7 @@ def look_for_ls(id_, text, url, comment):
         if terms not in seen:
             seen.append(terms)
             first10, total = load_search(terms)
-            if len(first10)>0:
+            if len(first10)>0 and total <= 14:
                 intro = "Your sequence ("+terms+") may be one of the following OEIS sequences."
                 if total > 4:
                     intro += " Or, it may be one of the "+str(total-4)+" other sequences listed [here](http://oeis.org/search?q="+terms+")."
