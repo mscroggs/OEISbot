@@ -43,7 +43,7 @@ def look_for_A(id_, text, url, comment):
         save_list(seen, id_)
         raise FoundOne
 
-def look_for_ls(id_, text, url, comment):
+def look_for_ls(id_, text, comment, link, message):
     seen = open_list(id_)
     if test:
         print(text)
@@ -67,7 +67,14 @@ def look_for_ls(id_, text, url, comment):
                 post_me.append(me())
                 comment(joiner().join(post_me))
                 save_list(seen, id_)
-                raise FoundOne            
+                raise FoundOne
+            elif len(first10)==0:
+                post_me("I couldn't find your sequence ("+terms+") in the OEIS. You should add it!")
+                message("PeteOK", "Sequence not in OEIS", "Hi Peter, I've just found a new sequence ("+terms+") in [this thread](link). Please shout at /u/mscroggs to turn the feature off if its spamming you!")
+                post_me.append(me())
+                comment(joiner().join(post_me))
+                save_list(seen, id_)
+                raise FoundOne
 
 def load_search(terms):
     src=urllib.urlopen("http://oeis.org/search?fmt=data&q="+terms).read()
@@ -115,13 +122,13 @@ try:
             if test:
                 print(submission.title)
             look_for_A(submission.id, submission.title, submission.url, submission.add_comment)
-            look_for_ls(submission.id, submission.title, submission.url, submission.add_comment)
+            look_for_ls(submission.id, submission.title, submission.add_comment, submission.url, r.send_message)
 
             flat_comments = praw.helpers.flatten_tree(submission.comments)
             for comment in flat_comments:
                 if not isinstance(comment,MoreComments) and comment.author is not None and comment.author.name != "OEISbot":
                     look_for_A(submission.id, re.sub("\[[^\]]*\]\([^\)*]\)","",comment.body), comment.body, comment.reply)
-                    look_for_ls(submission.id, re.sub("\[[^\]]*\]\([^\)*]\)","",comment.body), comment.body, comment.reply)
+                    look_for_ls(submission.id, re.sub("\[[^\]]*\]\([^\)*]\)","",comment.body), comment.reply, submission.url, r.send_message)
 
 except FoundOne:
     pass
