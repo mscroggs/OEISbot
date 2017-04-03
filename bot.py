@@ -58,7 +58,10 @@ def look_for_ls(id_, text, comment, link, message):
                 if test:
                     print(first10)
                 if len(first10)>0 and total <= 14:
-                    intro = "Your sequence ("+terms+") may be one of the following OEIS sequences."
+                    if total==1:
+                        intro = "Your sequence ("+terms+") looks like the following OEIS sequence."
+                    else:
+                        intro = "Your sequence ("+terms+") may be one of the following OEIS sequences."
                     if total > 4:
                         intro += " Or, it may be one of the "+str(total-4)+" other sequences listed [here](http://oeis.org/search?q="+terms+")."
                     post_me = [intro]
