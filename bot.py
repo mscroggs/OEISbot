@@ -6,19 +6,19 @@ from praw.objects import MoreComments
 
 import sys
 test = False
-if len(sys.argv)>1 and sys.argv[1]=="test":
+if len(sys.argv) > 1 and sys.argv[1] == "test":
     test=True
     print("TEST MODE")
 
 
 def save_list(seen, _id):
     print(seen)
-    with open("/home/pi/OEISbot/seen/"+_id,"w") as f:
+    with open("/home/pi/OEISbot/seen/"+_id, "w") as f:
         return json.dump(seen, f)
 
 def open_list(_id):
     try:
-        with open("/home/pi/OEISbot/seen/"+_id) as f:
+        with open("/home/pi/OEISbot/seen/" + _id) as f:
             return json.load(f)
     except:
         return []
@@ -28,20 +28,17 @@ class FoundOne(BaseException):
 
 def look_for_A(id_, text, url, comment):
     seen = open_list(id_)
-    re_s = re.findall("A([0-9]{6})",text)
-    re_s += re.findall("oeis\.org/A([0-9]{6})",url)
+    re_s = re.findall("A([0-9]{6})", text)
+    re_s += re.findall("oeis\.org/A([0-9]{6})", url)
     if test:
         print(re_s)
     post_me = []
-    mee = None
     for seq_n in re_s:
         if seq_n not in seen:
-            if mee is None:
-                mee = me(id_,seq_n)
             post_me.append(markup(seq_n))
             seen.append(seq_n)
-    if len(post_me)>0:
-        post_me.append(mee)
+    if len(post_me) > 0:
+        post_me.append(me())
         comment(joiner().join(post_me))
         save_list(seen, id_)
         raise FoundOne
@@ -50,8 +47,8 @@ def look_for_ls(id_, text, comment, link, message):
     seen = open_list(id_)
     if test:
         print(text)
-    re_s = re.findall("([0-9]+\, *(?:[0-9]+\, *)+[0-9]+)",text)
-    if len(re_s)>0:
+    re_s = re.findall("([0-9]+\, *(?:[0-9]+\, *)+[0-9]+)", text)
+    if len(re_s) > 0:
         for terms in ["".join(i.split(" ")) for i in re_s]:
             if test:
                 print(terms)
@@ -61,7 +58,7 @@ def look_for_ls(id_, text, comment, link, message):
                 if test:
                     print(first10)
                 if len(first10)>0 and total <= 14:
-                    if total==1:
+                    if total == 1:
                         intro = "Your sequence (" + terms \
                             + ") looks like the following OEIS sequence."
                     else:
@@ -74,17 +71,14 @@ def look_for_ls(id_, text, comment, link, message):
                     post_me = [intro]
                     if test:
                         print(first10)
-                    mee = None
                     for seq_n in first10[:4]:
-                        if mee is None:
-                            mee = me(id_,seq_n)
                         post_me.append(markup(seq_n))
                         seen.append(seq_n)
-                    post_me.append(mee)
+                    post_me.append(me())
                     comment(joiner().join(post_me))
                     save_list(seen, id_)
                     raise FoundOne
-                elif len(first10)==0:
+                elif len(first10) == 0:
                     post_me = ["I couldn't find your sequence (" + terms \
                         + ") in the [OEIS](http://oeis.org). "
                         "You should add it!"]
@@ -94,33 +88,33 @@ def look_for_ls(id_, text, comment, link, message):
                             + terms + ") in [this thread](link). " \
                             "Please shout at /u/mscroggs to turn the " \
                             "feature off if its spamming you!")
-                    post_me.append(mee)
+                    post_me.append(me())
                     comment(joiner().join(post_me))
                     save_list(seen, id_)
                     raise FoundOne
 
 def load_search(terms):
-    src=urllib.urlopen("http://oeis.org/search?fmt=data&q="+terms).read()
-    ls = re.findall("href=(?:'|\")/A([0-9]{6})(?:'|\")",src)
+    src = urllib.urlopen("http://oeis.org/search?fmt=data&q="+terms).read()
+    ls = re.findall("href=(?:'|\")/A([0-9]{6})(?:'|\")", src)
     try:
-        tot = int(re.findall("of ([0-9]+) results found",src)[0])
+        tot = int(re.findall("of ([0-9]+) results found", src)[0])
     except:
         tot = 0
     return ls, tot
 
 def markup(seq_n):
-    pattern = re.compile("%N (.*?)<",re.DOTALL|re.M)
-    desc=urllib.urlopen("http://oeis.org/A"+seq_n+"/internal").read()
-    desc=pattern.findall(desc)[0].strip("\n")
-    pattern = re.compile("%S (.*?)<",re.DOTALL|re.M)
-    seq=urllib.urlopen("http://oeis.org/A"+seq_n+"/internal").read()
-    seq=pattern.findall(seq)[0].strip("\n")
-    new_com = "[A"+seq_n+"](http://oeis.org/A"+seq_n+"/): "
-    new_com += desc+"\n\n"
-    new_com += seq+"..."
+    pattern = re.compile("%N (.*?)<", re.DOTALL|re.M)
+    desc = urllib.urlopen("http://oeis.org/A" + seq_n + "/internal").read()
+    desc = pattern.findall(desc)[0].strip("\n")
+    pattern = re.compile("%S (.*?)<", re.DOTALL|re.M)
+    seq = urllib.urlopen("http://oeis.org/A" + seq_n + "/internal").read()
+    seq = pattern.findall(seq)[0].strip("\n")
+    new_com = "[A" + seq_n + "](http://oeis.org/A" + seq_n + "/): "
+    new_com += desc + "\n\n"
+    new_com += seq + "..."
     return new_com
 
-def me(id_,seq_n):
+def me():
     return "I am OEISbot. I was programmed by /u/mscroggs. " \
            "[How I work](http://mscroggs.co.uk/blog/20). " \
            "You can test me and suggest new features at /r/TestingOEISbot/."
