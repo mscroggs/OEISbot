@@ -10,6 +10,8 @@ if len(sys.argv) > 1 and sys.argv[1] == "test":
     test=True
     print("TEST MODE")
 
+class FoundOne(BaseException):
+    pass
 
 def save_list(seen, _id):
     print(seen)
@@ -22,9 +24,6 @@ def open_list(_id):
             return json.load(f)
     except:
         return []
-
-class FoundOne(BaseException):
-    pass
 
 def look_for_A(id_, text, url, comment):
     seen = open_list(id_)
