@@ -33,12 +33,15 @@ def look_for_A(id_, text, url, comment):
     if test:
         print(re_s)
     post_me = []
+    mee = None
     for seq_n in re_s:
         if seq_n not in seen:
+            if mee is None:
+                mee = me(id_,seq_n)
             post_me.append(markup(seq_n))
             seen.append(seq_n)
     if len(post_me)>0:
-        post_me.append(me())
+        post_me.append(mee)
         comment(joiner().join(post_me))
         save_list(seen, id_)
         raise FoundOne
@@ -71,9 +74,13 @@ def look_for_ls(id_, text, comment, link, message):
                     post_me = [intro]
                     if test:
                         print(first10)
+                    mee = None
                     for seq_n in first10[:4]:
+                        if mee is None:
+                            mee = me(id_,seq_n)
                         post_me.append(markup(seq_n))
-                    post_me.append(me())
+                        seen.append(seq_n)
+                    post_me.append(mee)
                     comment(joiner().join(post_me))
                     save_list(seen, id_)
                     raise FoundOne
@@ -87,7 +94,7 @@ def look_for_ls(id_, text, comment, link, message):
                             + terms + ") in [this thread](link). " \
                             "Please shout at /u/mscroggs to turn the " \
                             "feature off if its spamming you!")
-                    post_me.append(me())
+                    post_me.append(mee)
                     comment(joiner().join(post_me))
                     save_list(seen, id_)
                     raise FoundOne
@@ -100,6 +107,29 @@ def load_search(terms):
     except:
         tot = 0
     return ls, tot
+
+def markup(seq_n):
+    pattern = re.compile("%N (.*?)<",re.DOTALL|re.M)
+    desc=urllib.urlopen("http://oeis.org/A"+seq_n+"/internal").read()
+    desc=pattern.findall(desc)[0].strip("\n")
+    pattern = re.compile("%S (.*?)<",re.DOTALL|re.M)
+    seq=urllib.urlopen("http://oeis.org/A"+seq_n+"/internal").read()
+    seq=pattern.findall(seq)[0].strip("\n")
+    new_com = "[A"+seq_n+"](http://oeis.org/A"+seq_n+"/): "
+    new_com += desc+"\n\n"
+    new_com += seq+"..."
+    return new_com
+
+def me(id_,seq_n):
+    return "I am OEISbot. I was programmed by /u/mscroggs. " \
+           "If I have commented by mistake, please " \
+           "[click here](http://mscroggs.co.uk/oeisdelete/" + id_ + \
+           "/" + seq_n + ") and I will delete this comment.\n" \
+           "[How I work](http://mscroggs.co.uk/blog/20). " \
+           "You can test me and suggest new features at /r/TestingOEISbot/."
+
+def joiner():
+    return "\n\n- - - -\n\n"
 
 r = praw.Reddit("OEIS link and description poster by /u/mscroggs.")
 
@@ -116,26 +146,6 @@ subs = ["TestingOEISbot","math","mathpuzzles","casualmath","theydidthemath",
 if test:
     subs = ["TestingOEISbot"]
 
-def markup(seq_n):
-    pattern = re.compile("%N (.*?)<",re.DOTALL|re.M)
-    desc=urllib.urlopen("http://oeis.org/A"+seq_n+"/internal").read()
-    desc=pattern.findall(desc)[0].strip("\n")
-    pattern = re.compile("%S (.*?)<",re.DOTALL|re.M)
-    seq=urllib.urlopen("http://oeis.org/A"+seq_n+"/internal").read()
-    seq=pattern.findall(seq)[0].strip("\n")
-    new_com = "[A"+seq_n+"](http://oeis.org/A"+seq_n+"/): "
-    new_com += desc+"\n\n"
-    new_com += seq+"..."
-    return new_com
-
-def me():
-    return "I am OEISbot. I was programmed by /u/mscroggs. " \
-           "[How I work](http://mscroggs.co.uk/blog/20). " \
-           "Want to test me or have suggestions for features? " \
-           "Head to /r/TestingOEISbot/."
-
-def joiner():
-    return "\n\n- - - -\n\n"
 try:
     for sub in subs:
         print(sub)
