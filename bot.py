@@ -122,9 +122,6 @@ def markup(seq_n):
 
 def me(id_,seq_n):
     return "I am OEISbot. I was programmed by /u/mscroggs. " \
-           "If I have commented by mistake, please " \
-           "[click here](http://mscroggs.co.uk/oeisdelete/" + id_ + \
-           "/" + seq_n + ") and I will delete this comment.\n" \
            "[How I work](http://mscroggs.co.uk/blog/20). " \
            "You can test me and suggest new features at /r/TestingOEISbot/."
 
