@@ -78,21 +78,21 @@ def look_for_ls(id_, text, comment, link, message=None):
                     comment(joiner().join(post_me))
                     save_list(seen, id_)
                     raise FoundOne
-                elif len(first10) == 0 and total == 0:
-                    post_me = ["I couldn't find your sequence (" + terms \
-                        + ") in the [OEIS](http://oeis.org). "
-                        "You should add it!"]
-                    if message is not None:
-                        message("PeteOK",
-                                "Sequence not in OEIS",
-                                "Hi Peter, I've just found a new sequence (" \
-                                + terms + ") in [this thread](link). " \
-                                "Please shout at /u/mscroggs to turn the " \
-                                "feature off if its spamming you!")
-                    post_me.append(me())
-                    comment(joiner().join(post_me))
-                    save_list(seen, id_)
-                    raise FoundOne
+                #elif len(first10) == 0 and total == 0:
+                #    post_me = ["I couldn't find your sequence (" + terms \
+                #        + ") in the [OEIS](http://oeis.org). "
+                #        "You should add it!"]
+                #    if message is not None:
+                #        message("PeteOK",
+                #                "Sequence not in OEIS",
+                #                "Hi Peter, I've just found a new sequence (" \
+                #                + terms + ") in [this thread](link). " \
+                #                "Please shout at /u/mscroggs to turn the " \
+                #                "feature off if its spamming you!")
+                #    post_me.append(me())
+                #    comment(joiner().join(post_me))
+                #    save_list(seen, id_)
+                #    raise FoundOne
 
 def load_search(terms):
     src = urllib.urlopen("http://oeis.org/search?fmt=data&q="+terms).read()
