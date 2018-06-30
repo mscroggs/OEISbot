@@ -26,6 +26,11 @@ def open_list(_id):
     except:
         return []
 
+def escape(text):
+    text = "\\^".join(text.split("^"))
+    text = "\\*".join(text.split("*"))
+    return text
+
 def look_for_A(id_, text, url, comment):
     seen = open_list(id_)
     re_s = re.findall("A([0-9]{6})", text)
@@ -39,7 +44,7 @@ def look_for_A(id_, text, url, comment):
             seen.append(seq_n)
     if len(post_me) > 0:
         post_me.append(me())
-        comment(joiner().join(post_me))
+        comment(escape(joiner().join(post_me)))
         save_list(seen, id_)
         raise FoundOne
 
@@ -75,24 +80,9 @@ def look_for_ls(id_, text, comment, link, message=None):
                         post_me.append(markup(seq_n))
                         seen.append(seq_n)
                     post_me.append(me())
-                    comment(joiner().join(post_me))
+                    comment(escape(joiner().join(post_me)))
                     save_list(seen, id_)
                     raise FoundOne
-                #elif len(first10) == 0 and total == 0:
-                #    post_me = ["I couldn't find your sequence (" + terms \
-                #        + ") in the [OEIS](http://oeis.org). "
-                #        "You should add it!"]
-                #    if message is not None:
-                #        message("PeteOK",
-                #                "Sequence not in OEIS",
-                #                "Hi Peter, I've just found a new sequence (" \
-                #                + terms + ") in [this thread](link). " \
-                #                "Please shout at /u/mscroggs to turn the " \
-                #                "feature off if its spamming you!")
-                #    post_me.append(me())
-                #    comment(joiner().join(post_me))
-                #    save_list(seen, id_)
-                #    raise FoundOne
 
 def load_search(terms):
     src = urllib.urlopen("http://oeis.org/search?fmt=data&q="+terms).read()
