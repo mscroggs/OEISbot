@@ -149,10 +149,10 @@ try:
                        submission.title + "|" + submission.selftext,
                        submission.url,
                        submission.reply)
-            look_for_ls(submission.id,
-                        submission.title + "|" + submission.selftext,
-                        submission.reply,
-                        submission.url)
+            #look_for_ls(submission.id,
+            #            submission.title + "|" + submission.selftext,
+            #            submission.reply,
+            #            submission.url)
 
             for comment in submission.comments:
                 if ( not isinstance(comment, MoreComments)
@@ -162,10 +162,10 @@ try:
                                re.sub("\[[^\]]*\]\([^\)*]\)","",comment.body),
                                comment.body,
                                comment.reply)
-                    look_for_ls(submission.id,
-                                re.sub("\[[^\]]*\]\([^\)*]\)","",comment.body),
-                                comment.reply,
-                                submission.url)
+                    #look_for_ls(submission.id,
+                    #            re.sub("\[[^\]]*\]\([^\)*]\)","",comment.body),
+                    #            comment.reply,
+                    #            submission.url)
 
 except FoundOne:
     pass
