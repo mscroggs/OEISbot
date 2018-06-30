@@ -1,8 +1,9 @@
+from __future__ import print_function
 import praw
 import re
 import urllib
 import json
-from praw.objects import MoreComments
+from praw.models import MoreComments
 
 import sys
 test = False
@@ -47,7 +48,7 @@ def look_for_A(id_, text, url, comment):
         save_list(seen, id_)
         raise FoundOne
 
-def look_for_ls(id_, text, comment, link, message):
+def look_for_ls(id_, text, comment, link, message=None):
     seen = open_list(id_)
     if test:
         print(text)
@@ -66,32 +67,18 @@ def look_for_ls(id_, text, comment, link, message):
                         intro = "Your sequence (" + terms \
                             + ") looks like the following OEIS sequence."
                     else:
-                        intro = "Your sequence (" + terms + \
+                        intro = "Your sequence (" + terms \
                             + ") may be one of the following OEIS sequences."
                     if total > 4:
                         intro += " Or, it may be one of the " + str(total-4) \
                             + " other sequences listed [here]" \
-                            "(http://oeis.org/search?q=" + terms + ")."
+                            + "(http://oeis.org/search?q=" + terms + ")."
                     post_me = [intro]
                     if test:
                         print(first10)
                     for seq_n in first10[:4]:
                         post_me.append(markup(seq_n))
                         seen.append(seq_n)
-                    post_me.append(me())
-                    comment(escape(joiner().join(post_me)))
-                    save_list(seen, id_)
-                    raise FoundOne
-                elif len(first10) == 0:
-                    post_me = ["I couldn't find your sequence (" + terms \
-                        + ") in the [OEIS](http://oeis.org). "
-                        "You should add it!"]
-                    message("PeteOK",
-                            "Sequence not in OEIS",
-                            "Hi Peter, I've just found a new sequence (" \
-                            + terms + ") in [this thread](link). " \
-                            "Please shout at /u/mscroggs to turn the " \
-                            "feature off if its spamming you!")
                     post_me.append(me())
                     comment(escape(joiner().join(post_me)))
                     save_list(seen, id_)
@@ -126,12 +113,12 @@ def me():
 def joiner():
     return "\n\n- - - -\n\n"
 
-r = praw.Reddit("OEIS link and description poster by /u/mscroggs.")
+r = praw.Reddit("DEFAULT", user_agent="OEIS sequence poster")
 
-access_i = r.refresh_access_information(refresh_token=r.refresh_token)
-r.set_access_credentials(**access_i)
+#access_i = r.refresh_access_information(refresh_token=r.refresh_token)
+#r.set_access_credentials(**access_i)
 
-auth = r.get_me()
+auth = r.user
 
 subs = ["TestingOEISbot","math","mathpuzzles","casualmath","theydidthemath",
         "learnmath","mathbooks","cheatatmathhomework","matheducation",
@@ -144,22 +131,20 @@ if test:
 try:
     for sub in subs:
         print(sub)
-        subreddit = r.get_subreddit(sub)
-        for submission in subreddit.get_hot(limit = 10):
+        subreddit = r.subreddit(sub)
+        for submission in subreddit.hot(limit = 10):
             if test:
                 print(submission.title)
             look_for_A(submission.id,
                        submission.title + "|" + submission.selftext,
                        submission.url,
-                       submission.add_comment)
+                       submission.reply)
             look_for_ls(submission.id,
                         submission.title + "|" + submission.selftext,
-                        submission.add_comment,
-                        submission.url,
-                        r.send_message)
+                        submission.reply,
+                        submission.url)
 
-            flat_comments = praw.helpers.flatten_tree(submission.comments)
-            for comment in flat_comments:
+            for comment in submission.comments:
                 if ( not isinstance(comment, MoreComments)
                      and comment.author is not None
                      and comment.author.name != "OEISbot" ):
@@ -170,8 +155,7 @@ try:
                     look_for_ls(submission.id,
                                 re.sub("\[[^\]]*\]\([^\)*]\)","",comment.body),
                                 comment.reply,
-                                submission.url,
-                                r.send_message)
+                                submission.url)
 
 except FoundOne:
     pass
