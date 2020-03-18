@@ -1,7 +1,7 @@
 from __future__ import print_function
 import praw
 import re
-import urllib
+import urllib.request
 import json
 from praw.models import MoreComments
 
@@ -13,6 +13,13 @@ if len(sys.argv) > 1 and sys.argv[1] == "test":
 
 class FoundOne(BaseException):
     pass
+
+
+def read_url(url):
+    with urllib.request.urlopen(url) as r:
+        data = r.read()
+    return data.decode('utf-8')
+
 
 def save_list(seen, _id):
     print(seen)
@@ -85,7 +92,7 @@ def look_for_ls(id_, text, comment, link, message=None):
                     raise FoundOne
 
 def load_search(terms):
-    src = urllib.urlopen("http://oeis.org/search?fmt=data&q="+terms).read()
+    src = read_url("http://oeis.org/search?fmt=data&q="+terms)
     ls = re.findall("href=(?:'|\")/A([0-9]{6})(?:'|\")", src)
     try:
         tot = int(re.findall("of ([0-9]+) results found", src)[0])
@@ -95,10 +102,10 @@ def load_search(terms):
 
 def markup(seq_n):
     pattern = re.compile("%N (.*?)<", re.DOTALL|re.M)
-    desc = urllib.urlopen("http://oeis.org/A" + seq_n + "/internal").read()
+    desc = read_url("http://oeis.org/A" + seq_n + "/internal")
     desc = pattern.findall(desc)[0].strip("\n")
     pattern = re.compile("%S (.*?)<", re.DOTALL|re.M)
-    seq = urllib.urlopen("http://oeis.org/A" + seq_n + "/internal").read()
+    seq = read_url("http://oeis.org/A" + seq_n + "/internal")
     seq = pattern.findall(seq)[0].strip("\n")
     new_com = "[A" + seq_n + "](http://oeis.org/A" + seq_n + "/): "
     new_com += desc + "\n\n"
