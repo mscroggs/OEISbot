@@ -38,10 +38,23 @@ def escape(text):
     text = "\\*".join(text.split("*"))
     return text
 
-def look_for_A(id_, text, url, comment):
+def deduplicate(target_list):
+    unique_values = []
+    [unique_values.append(x) for x in target_list if x not in unique_values]
+    return unique_values
+
+def a_numbers_in_text(body):
+    valid_prefix            = "(?:[\s\/'\"\-\+\*]|^)"
+    optional_opening_parens = "[\[\(\{]*"
+    a_number                = "A(\d{6})"
+    valid_suffix            = "(?:[\s\(\)\[\]]|$)"
+    a_number_regex_pattern = valid_prefix + optional_opening_parens + a_number + valid_suffix
+    all_matches = re.findall(a_number_regex_pattern, body)
+    return deduplicate(all_matches)
+
+def look_for_A(id_, text, comment):
     seen = open_list(id_)
-    re_s = re.findall("A([0-9]{6})", text)
-    re_s += re.findall("oeis\.org/A([0-9]{6})", url)
+    re_s = a_numbers_in_text(text)
     if test:
         print(re_s)
     post_me = []
@@ -116,7 +129,6 @@ try:
                      and comment.author is not None
                      and comment.author.name != "OEISbot" ):
                     look_for_A(submission.id,
-                               re.sub("\[[^\]]*\]\([^\)*]\)","",comment.body),
                                comment.body,
                                comment.reply)
 
