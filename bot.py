@@ -121,7 +121,6 @@ try:
                 print(submission.title)
             look_for_A(submission.id,
                        submission.title + "|" + submission.selftext,
-                       submission.url,
                        submission.reply)
 
             for comment in submission.comments:
