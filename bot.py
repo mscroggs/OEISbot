@@ -38,10 +38,23 @@ def escape(text):
     text = "\\*".join(text.split("*"))
     return text
 
-def look_for_A(id_, text, url, comment):
+def deduplicate(target_list):
+    unique_values = []
+    [unique_values.append(x) for x in target_list if x not in unique_values]
+    return unique_values
+
+def a_numbers_in_text(body):
+    valid_prefix            = "(?:[\s\/'\"\-\+\*]|^)"
+    optional_opening_parens = "[\[\(\{]*"
+    a_number                = "A(\d{6})"
+    valid_suffix            = "(?:[\s\(\)\[\]]|$)"
+    a_number_regex_pattern = valid_prefix + optional_opening_parens + a_number + valid_suffix
+    all_matches = re.findall(a_number_regex_pattern, body)
+    return deduplicate(all_matches)
+
+def look_for_A(id_, text, comment):
     seen = open_list(id_)
-    re_s = re.findall("A([0-9]{6})", text)
-    re_s += re.findall("oeis\.org/A([0-9]{6})", url)
+    re_s = a_numbers_in_text(text)
     if test:
         print(re_s)
     post_me = []
@@ -54,42 +67,6 @@ def look_for_A(id_, text, url, comment):
         comment(escape(joiner().join(post_me)))
         save_list(seen, id_)
         raise FoundOne
-
-def look_for_ls(id_, text, comment, link, message=None):
-    seen = open_list(id_)
-    if test:
-        print(text)
-    re_s = re.findall("([0-9]+\, *(?:[0-9]+\, *)+[0-9]+)", text)
-    if len(re_s) > 0:
-        for terms in ["".join(i.split(" ")) for i in re_s]:
-            if test:
-                print(terms)
-            if terms not in seen:
-                seen.append(terms)
-                first10, total = load_search(terms)
-                if test:
-                    print(first10)
-                if len(first10)>0 and total <= 14:
-                    if total == 1:
-                        intro = "Your sequence (" + terms \
-                            + ") looks like the following OEIS sequence."
-                    else:
-                        intro = "Your sequence (" + terms \
-                            + ") may be one of the following OEIS sequences."
-                    if total > 4:
-                        intro += " Or, it may be one of the " + str(total-4) \
-                            + " other sequences listed [here]" \
-                            + "(http://oeis.org/search?q=" + terms + ")."
-                    post_me = [intro]
-                    if test:
-                        print(first10)
-                    for seq_n in first10[:4]:
-                        post_me.append(markup(seq_n))
-                        seen.append(seq_n)
-                    post_me.append(me())
-                    comment(escape(joiner().join(post_me)))
-                    save_list(seen, id_)
-                    raise FoundOne
 
 def load_search(terms):
     src = read_url("http://oeis.org/search?fmt=data&q="+terms)
@@ -146,23 +123,14 @@ try:
                        submission.title + "|" + submission.selftext,
                        submission.url,
                        submission.reply)
-            #look_for_ls(submission.id,
-            #            submission.title + "|" + submission.selftext,
-            #            submission.reply,
-            #            submission.url)
 
             for comment in submission.comments:
                 if ( not isinstance(comment, MoreComments)
                      and comment.author is not None
                      and comment.author.name != "OEISbot" ):
                     look_for_A(submission.id,
-                               re.sub("\[[^\]]*\]\([^\)*]\)","",comment.body),
                                comment.body,
                                comment.reply)
-                    #look_for_ls(submission.id,
-                    #            re.sub("\[[^\]]*\]\([^\)*]\)","",comment.body),
-                    #            comment.reply,
-                    #            submission.url)
 
 except FoundOne:
     pass
